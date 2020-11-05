@@ -94,8 +94,6 @@ class NocapsEvaluator(object):
         submission_command_stdout = submission_command_subprocess.communicate(input=b"N\n")[
             0
         ].decode("utf-8")
-        
-        print(submission_command_stdout)
 
         submission_id_regex = re.search("evalai submission ([0-9]+)", submission_command_stdout)
         try:
