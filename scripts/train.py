@@ -226,7 +226,7 @@ if __name__ == "__main__":
                 model.eval()
                 predictions: List[Prediction] = []
 
-                for batch in tqdm(val_dataloader):
+                for batch in tqdm(val_dataloader, position=0, leave=True):
                     # keys: {"image_id", "image_features"}
                     batch = {key: value.to(device) for key, value in batch.items()}
 
