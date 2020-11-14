@@ -110,3 +110,8 @@ class CheckpointManager(object):
             self._best_ckpt,
             os.path.join(self._serialization_dir, f"{self._filename_prefix}_best.pth"),
         )
+        try:
+            from google.colab import files
+            files.download(os.path.join(self._serialization_dir, f"{self._filename_prefix}_best.pth"))
+        except:
+            pass
