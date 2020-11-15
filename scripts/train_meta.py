@@ -17,6 +17,7 @@ from updown.data.datasets import (
     EvaluationDataset,
     EvaluationDatasetWithConstraints,
 )
+from updown.data.proto_batch_sampler import PrototypicalBatchSampler
 from updown.models import UpDownCaptioner
 from updown.types import Prediction
 from updown.utils.checkpointing import CheckpointManager

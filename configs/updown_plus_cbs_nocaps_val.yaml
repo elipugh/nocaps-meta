@@ -9,6 +9,10 @@ DATA:
   INFER_CAPTIONS: data/nocaps/nocaps_val_image_info.json
 
   MAX_CAPTION_LENGTH: 20
+  CLASSES_PER_IT : 32
+  NUM_SAMPLES : 5
+  ITERATIONS : 64
+
 
   CBS:
     INFER_BOXES: data/nocaps_val_oi_detector_boxes.json
