@@ -2,6 +2,7 @@
 import numpy as np
 import torch
 
+from torch.utils.data import Dataset
 from allennlp.data import Vocabulary
 
 from updown.config import Config
@@ -10,8 +11,8 @@ from updown.data.readers import CocoCaptionsReader, ConstraintBoxesReader, Image
 from updown.utils.constraints import ConstraintFilter, FiniteStateMachineBuilder
 
 
-class PrototypicalBatchSampler(object):
-    '''
+class PrototypicalBatchSampler(Dataset):
+    r'''
     PrototypicalBatchSampler: yield a batch of indexes at each iteration.
     Indexes are calculated by keeping in account 'classes_per_it' and 'num_samples',
     In fact at every iteration the batch indexes will refer to  'num_support' + 'num_query' samples
@@ -78,6 +79,9 @@ class PrototypicalBatchSampler(object):
             in_memory=kwargs.pop("in_memory"),
         )
 
+###############################################################################################
+## To Remove ##
+###############
     def __iter__(self):
         '''
         yield a batch of indexes
@@ -97,9 +101,53 @@ class PrototypicalBatchSampler(object):
                 batch[s] = self.indexes[label_idx][sample_idxs]
             batch = batch[torch.randperm(len(batch))]
             yield batch
+###############################################################################################
 
     def __len__(self):
-        '''
-        returns the number of iterations (episodes) per epoch
-        '''
-        return self.iterations
+        # Number of training examples are number of captions, not number of images.
+        return len(self._captions_reader)
+
+    def __getitem__(self, index: int) -> TrainingInstance:
+        image_id, caption = self._captions_reader[index]
+        image_features = self._image_features_reader[image_id]
+
+        # Tokenize caption.
+        caption_tokens: List[int] = [self._vocabulary.get_token_index(c) for c in caption]
+
+        # Pad upto max_caption_length.
+        caption_tokens = caption_tokens[: self._max_caption_length]
+        caption_tokens.extend(
+            [self._vocabulary.get_token_index("@@UNKNOWN@@")]
+            * (self._max_caption_length - len(caption_tokens))
+        )
+
+        item: TrainingInstance = {
+            "image_id": image_id,
+            "image_features": image_features,
+            "caption_tokens": caption_tokens,
+        }
+        return item
+
+    def collate_fn(self, batch_list: List[TrainingInstance]) -> TrainingBatch:
+        # Convert lists of ``image_id``s and ``caption_tokens``s as tensors.
+        image_id = torch.tensor([instance["image_id"] for instance in batch_list]).long()
+        caption_tokens = torch.tensor(
+            [instance["caption_tokens"] for instance in batch_list]
+        ).long()
+
+        # Pad adaptive image features in the batch.
+        image_features = torch.from_numpy(
+            _collate_image_features([instance["image_features"] for instance in batch_list])
+        )
+
+        batch: TrainingBatch = {
+            "image_id": image_id,
+            "image_features": image_features,
+            "caption_tokens": caption_tokens,
+        }
+        return batch
+
+
+
+
+
