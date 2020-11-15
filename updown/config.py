@@ -148,6 +148,9 @@ class Config(object):
         _C.DATA.CBS.INFER_BOXES = "data/nocaps_val_oi_detector_boxes.json"
         _C.DATA.CBS.CLASS_HIERARCHY = "data/cbs/class_hierarchy.json"
         _C.DATA.CBS.WORDFORMS = "data/cbs/constraint_wordforms.tsv"
+        _C.DATA.CLASSES_PER_IT = 32
+        _C.DATA.NUM_SAMPLES = 5
+        _C.DATA.ITERATIONS = 64
 
         _C.DATA.CBS.NMS_THRESHOLD = 0.85
         _C.DATA.CBS.MAX_GIVEN_CONSTRAINTS = 3
