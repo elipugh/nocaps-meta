@@ -193,6 +193,7 @@ class Meta(nn.Module):
                 sd2[k] = params[i]
                 i += 1
 
+        losses = []
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
             net.load_state_dict(sd2)
@@ -213,9 +214,9 @@ class Meta(nn.Module):
                     sd2[key] = params[i]
                     i += 1
             net.load_state_dict(sd2)
-            loss_q = net(x_qry, y_qry)
+            losses += [net(x_qry, y_qry)]
 
 
         del net
 
-        return loss_q
+        return losses
