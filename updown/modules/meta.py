@@ -70,6 +70,9 @@ class Meta(nn.Module):
         :param y_qry:   [b, querysz, maxlen, d_emb]
         :return:
         """
+        x,y = batch["image_features"], batch["caption_tokens"]
+        print(x.size())
+        print(y.size())
         x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
         y_spt, y_qry = y[:self.k_spt], y[self.k_spt:]
         task_num, setsz, c_, h, w = x_spt.size()
@@ -126,7 +129,7 @@ class Meta(nn.Module):
 
         return loss
 
-    def finetunning(self, x_spt, y_spt, x_qry, y_qry):
+    def finetuning(self, x_spt, y_spt, x_qry, y_qry):
         """
         :param x_spt:   [setsz, c_, h, w]
         :param y_spt:   [setsz]

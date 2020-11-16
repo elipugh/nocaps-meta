@@ -151,16 +151,20 @@ if __name__ == "__main__":
             for key in b:
                 b[key] = b[key].to(device)
 
-        loss = maml(batch)
+        losses = []
+        for b in batch:
+            losses += [maml(b)]
+
+        print(losses)
         if (iteration%30) == 0:
-            print(loss)
+            print(losses)
 
         if (iteration%500) == 0:
             losses_all_test = []
             for i in range(100):
                 x, y = next(train_dataloader)
                 x, y = x.to(device), y.to(device)
-                loss = maml.finetunning(x, y)
+                loss = maml.finetuning(x, y)
                 losses_all_test.append(loss)
             losses = np.array(losses_all_test).mean(axis=0).astype(np.float16)
             print("Test acc:", losses)
@@ -172,3 +176,5 @@ if __name__ == "__main__":
         # ----------------------------------------------------------------------------------------
         if iteration % _A.checkpoint_every == 0:
             pass
+
+
