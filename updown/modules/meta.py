@@ -32,7 +32,7 @@ class Meta(nn.Module):
         self.update_step_test = config.DATA.UPDATE_STEP_TEST
         self.vocabulary=vocabulary
 
-
+        device = torch.device(f"cuda:{_A.gpu_ids[0]}" if _A.gpu_ids[0] >= 0 else "cpu")
         self.net = UpDownCaptioner.from_config(config, vocabulary=vocabulary).to(device)
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
