@@ -183,11 +183,10 @@ class Meta(nn.Module):
         net.train()
         loss = net(x_spt,y_spt)
         params = []
-        for k,v in net.state_dict().items():
+        for k,v in self.sd.items():
             if v.requires_grad:
                 params += [v]
-        if params == []:
-            params = net.parameters()
+
         print(params)
         grad = torch.autograd.grad(loss, params)
         params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
