@@ -22,14 +22,14 @@ class Meta(nn.Module):
         """
         super(Meta, self).__init__()
 
-        self.update_lr = config.UPDATE_LR
-        self.meta_lr = config.META_LR
-        self.n_way = config.N_WAY
-        self.k_spt = config.K_SPT
-        self.k_qry = config.K_QRY
-        self.task_num = config.TASK_NUM
-        self.update_step = config.UPDATE_STEP
-        self.update_step_test = config.UPDATE_STEP_TEST
+        self.update_lr = config.DATA.UPDATE_LR
+        self.meta_lr = config.DATA.META_LR
+        self.n_way = config.DATA.N_WAY
+        self.k_spt = config.DATA.K_SPT
+        self.k_qry = config.DATA.K_QRY
+        self.task_num = config.DATA.TASK_NUM
+        self.update_step = config.DATA.UPDATE_STEP
+        self.update_step_test = config.DATA.UPDATE_STEP_TEST
         self.vocabulary=vocabulary
 
 
