@@ -93,7 +93,7 @@ class Meta(nn.Module):
             print(loss)
 
             params = []
-            for k,v in self.sd:
+            for k,v in self.sd.items():
                 if v.requires_grad:
                     params += v
 
@@ -102,7 +102,7 @@ class Meta(nn.Module):
 
             sd2 = deepcopy(self.sd)
             i = 0
-            for k,v in self.net.state_dict().items():
+            for k,v in self.sd.items():
                 if v.requires_grad:
                     sd2[k] = params[i]
                     i += 1
@@ -130,7 +130,7 @@ class Meta(nn.Module):
                 loss = output_dict["loss"].mean()
                 # 2. compute grad on theta_pi
                 params = []
-                for k,v in self.net.state_dict().items():
+                for k,v in self.sd.items():
                     if v.requires_grad:
                         params += v
                 grad = torch.autograd.grad(loss, params)
@@ -139,7 +139,7 @@ class Meta(nn.Module):
 
                 sd2 = deepcopy(self.net.state_dict())
                 i = 0
-                for k,v in self.net.state_dict().items():
+                for k,v in self.sd.items():
                     if v.requires_grad:
                         sd2[k] = params[i]
                         i += 1
