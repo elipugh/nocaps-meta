@@ -91,10 +91,10 @@ class Meta(nn.Module):
             loss = output_dict["loss"].mean()
             print(loss)
 
-            for n,p in self.parameters():
-                print(n, p.requires_grad)
-
             print(self.net.state_dict().keys())
+
+            for p in self.parameters():
+                print(p.requires_grad)
 
             num_parameters = sum(p.numel() for p in self.net.parameters())
             num_state_dict = sum(p.numel() for p in self.net.state_dict().values())
