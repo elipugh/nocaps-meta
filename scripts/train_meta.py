@@ -146,18 +146,15 @@ if __name__ == "__main__":
     for iteration in tqdm(range(0, _C.OPTIM.NUM_ITERATIONS + 1)):
 
         # keys: {"image_id", "image_features", "caption_tokens"}
-        batch = next(train_dataloader)
-        for b in batch:
+        batches = next(train_dataloader)
+        for b in batches:
             for key in b:
                 b[key] = b[key].to(device)
 
-        losses = []
-        for b in batch:
-            losses += [maml(b)]
+        loss = maml(batches)
 
-        print(losses)
         if (iteration%30) == 0:
-            print(losses)
+            print(loss)
 
         if (iteration%500) == 0:
             losses_all_test = []

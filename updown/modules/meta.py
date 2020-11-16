@@ -70,17 +70,16 @@ class Meta(nn.Module):
         :param y_qry:   [b, querysz, maxlen, d_emb]
         :return:
         """
-        x,y = batch["image_features"], batch["caption_tokens"]
-        print(x.size())
-        print(y.size())
-        x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
-        y_spt, y_qry = y[:self.k_spt], y[self.k_spt:]
-        task_num, setsz, c_, h, w = x_spt.size()
-        querysz = x_qry.size(1)
+        task_num = len(batch)
 
         losses_q = [0 for _ in range(self.update_step + 1)]
 
         for i in range(task_num):
+            x,y = batch[i]["image_features"], batch[i]["caption_tokens"]
+            print(x.size())
+            print(y.size())
+            x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
+            y_spt, y_qry = y[:self.k_spt], y[self.k_spt:]
             # 1. run the i-th task and compute loss for k=0
             output_dict = self.net(x_spt[i], y_spt[i], self.net.parameters)
             loss = output_dict["loss"].mean()
