@@ -181,7 +181,8 @@ class Meta(nn.Module):
         # 1. run the i-th task and compute loss for k=0
         net.load_state_dict(self.sd)
         net.train()
-        loss = net(x_spt,y_spt)
+        output_dict = net(x_spt,y_spt)
+        loss = output_dict["loss"].mean()
         params = []
         for k,v in self.sd.items():
             if v.requires_grad:
@@ -201,7 +202,8 @@ class Meta(nn.Module):
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
             net.load_state_dict(sd2)
-            loss = net(x_spt, y_spt)
+            output_dict = net(x_spt, y_spt)
+            loss = output_dict["loss"].mean()
             params = []
             for _,v in net.state_dict().items():
                 if v.requires_grad:
@@ -217,7 +219,7 @@ class Meta(nn.Module):
                     sd2[key] = params[i]
                     i += 1
             net.load_state_dict(sd2)
-            losses += [net(x_qry, y_qry)]
+            losses += [net(x_qry, y_qry)["loss"].mean()]
 
 
         del net
