@@ -144,7 +144,7 @@ class Meta(nn.Module):
                         sd2[k] = params[i]
                         i += 1
                 self.net.load_state_dict(sd2)
-                output_dict_q = self.net(x_qry[i], y_qry[i])
+                output_dict_q = self.net(torch.unsqueeze(x_qry[i],0), torch.unsqueeze(y_qry[i],0))
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[k + 1] += loss_q
 
