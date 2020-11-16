@@ -90,6 +90,8 @@ class Meta(nn.Module):
             loss = output_dict["loss"].mean()
             print(loss)
 
+            print(self.net.parameters())
+
             grad = torch.autograd.grad(loss, self.net.state_dict(), allow_unused=True)
             fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, self.net.state_dict())))
 
