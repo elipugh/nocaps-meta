@@ -101,7 +101,10 @@ class Meta(nn.Module):
             num_state_dict = sum(p.numel() for p in self.net.state_dict().values())
             print('num parameters = {}, stored in state_dict = {}, diff = {}'.format(num_parameters, num_state_dict, num_state_dict - num_parameters))
 
-            params = [v if v.requires_grad for k,v in self.net.state_dict().items()]
+            params = []
+            for k,v in self.net.state_dict().items():
+                if v.requires_grad:
+                    params += v
             grad = torch.autograd.grad(loss, params, allow_unused=True)
             fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
             sd2 = self.net.state_dict()
