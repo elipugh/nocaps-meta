@@ -81,7 +81,9 @@ class Meta(nn.Module):
             x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
             y_spt, y_qry = y[:self.k_spt], y[self.k_spt:]
             # 1. run the i-th task and compute loss for k=0
-            output_dict = self.net(x_spt[i], y_spt[i], self.net.parameters)
+            output_dict = self.net(x_spt[i], y_spt[i])
+            sd = self.net.state_dict()
+            print(sd)
             loss = output_dict["loss"].mean()
 
             grad = torch.autograd.grad(loss, self.net.parameters())
