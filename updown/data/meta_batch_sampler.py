@@ -73,7 +73,7 @@ class MetaBatchSampler(object):
                 self.words2idxs[ct] += [i]
             i+=1
 
-        self.classes = list(word2idxs.keys())
+        self.classes = list(words2idxs.keys())
 
     @classmethod
     def from_config(cls, config: Config, **kwargs):
