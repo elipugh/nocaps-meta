@@ -99,24 +99,27 @@ class TrainingDataset(Dataset):
             items += [item]
         return items
 
-    def collate_fn(self, batch_list: List[TrainingInstance]) -> TrainingBatch:
-        # Convert lists of ``image_id``s and ``caption_tokens``s as tensors.
-        image_id = torch.tensor([instance["image_id"] for instance in batch_list]).long()
-        caption_tokens = torch.tensor(
-            [instance["caption_tokens"] for instance in batch_list]
-        ).long()
+    def collate_fn(self, batch_lists: List[TrainingInstance]) -> TrainingBatch:
+        batches = []
+        for batch_list in batch_lists:
+            # Convert lists of ``image_id``s and ``caption_tokens``s as tensors.
+            image_id = torch.tensor([instance["image_id"] for instance in batch_list]).long()
+            caption_tokens = torch.tensor(
+                [instance["caption_tokens"] for instance in batch_list]
+            ).long()
 
-        # Pad adaptive image features in the batch.
-        image_features = torch.from_numpy(
-            _collate_image_features([instance["image_features"] for instance in batch_list])
-        )
+            # Pad adaptive image features in the batch.
+            image_features = torch.from_numpy(
+                _collate_image_features([instance["image_features"] for instance in batch_list])
+            )
 
-        batch: TrainingBatch = {
-            "image_id": image_id,
-            "image_features": image_features,
-            "caption_tokens": caption_tokens,
-        }
-        return batch
+            batch: TrainingBatch = {
+                "image_id": image_id,
+                "image_features": image_features,
+                "caption_tokens": caption_tokens,
+            }
+            batches += batch
+        return batches
 
 
 class EvaluationDataset(Dataset):
