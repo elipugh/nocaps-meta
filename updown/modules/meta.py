@@ -81,7 +81,7 @@ class Meta(nn.Module):
             x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
             y_spt, y_qry = y[:self.k_spt], y[self.k_spt:]
             # 1. run the i-th task and compute loss for k=0
-            output_dict = self.net(x_spt[i], y_spt[i])
+            output_dict = self.net(x_spt, y_spt)
             sd = self.net.state_dict()
             print(sd)
             loss = output_dict["loss"].mean()
@@ -92,14 +92,14 @@ class Meta(nn.Module):
             # this is the loss and accuracy before first update
             with torch.no_grad():
                 # [setsz, nway]
-                output_dict_q = self.net(x_qry[i], y_qry[i], self.net.parameters())
+                output_dict_q = self.net(x_qry, y_qry, self.net.parameters())
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[0] += loss_q
 
             # this is the loss and accuracy after the first update
             with torch.no_grad():
                 # [setsz, nway]
-                output_dict_q = self.net(x_qry[i], y_qry[i], fast_weights)
+                output_dict_q = self.net(x_qry, y_qry, fast_weights)
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[1] += loss_q
 
