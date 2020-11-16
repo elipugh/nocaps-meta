@@ -105,7 +105,7 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True
 
     # Set device according to specified GPU ids.
-    device = torch.device("cuda:0")
+    device = torch.device(f"cuda:{_A.gpu_ids[0]}" if _A.gpu_ids[0] >= 0 else "cpu")
 
     # --------------------------------------------------------------------------------------------
     #   INSTANTIATE VOCABULARY, DATALOADER, MODEL, OPTIMIZER
@@ -143,7 +143,7 @@ if __name__ == "__main__":
     # --------------------------------------------------------------------------------------------
     #   TRAINING LOOP
     # --------------------------------------------------------------------------------------------
-    for iteration in tqdm(range(start_iteration, _C.OPTIM.NUM_ITERATIONS + 1)):
+    for iteration in tqdm(range(0, _C.OPTIM.NUM_ITERATIONS + 1)):
 
         # keys: {"image_id", "image_features", "caption_tokens"}
         x, y = next(train_dataloader)
