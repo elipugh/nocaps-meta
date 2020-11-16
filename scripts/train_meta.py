@@ -152,7 +152,8 @@ if __name__ == "__main__":
         x, y = x.to(device), y.to(device)
 
         loss = maml(x,y)
-        if (iteration%30) == 0
+        if (iteration%30) == 0:
+            print(loss)
 
         if (iteration%500) == 0:
             losses_all_test = []
