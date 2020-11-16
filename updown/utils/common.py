@@ -19,6 +19,6 @@ def cycle(
     """
     while True:
         for batch in dataloader:
-            for key in batch:
-                batch[key] = batch[key].to(device)
+            # for key in batch:
+            #     batch[key] = batch[key].to(device)
             yield batch
