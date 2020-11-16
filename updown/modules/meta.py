@@ -83,6 +83,7 @@ class Meta(nn.Module):
             x_spt, x_qry = x_spt.to(self.device), x_qry.to(self.device)
             y_spt, y_qry = y_spt.to(self.device), y_qry.to(self.device)
             # 1. run the i-th task and compute loss for k=0
+            self.net.train()
             self.meta_optim.zero_grad()
             sd = self.net.state_dict()
             output_dict = self.net(x_spt, y_spt)
@@ -90,13 +91,14 @@ class Meta(nn.Module):
             loss = output_dict["loss"].mean()
             print(loss)
 
-            num_parameters = sum(p.numel() for p in self.net.parameters())
-            num_state_dict = sum(p.numel() for p in self.net.state_dict.values())
-            print('num parameters = {}, stored in state_dict = {}, diff = {}'.format(num_parameters, num_state_dict, num_state_dict - num_parameters))
             for n,p in self.parameters():
                 print(n, p.requires_grad)
 
             print(self.net.state_dict().keys())
+
+            num_parameters = sum(p.numel() for p in self.net.parameters())
+            num_state_dict = sum(p.numel() for p in self.net.state_dict().values())
+            print('num parameters = {}, stored in state_dict = {}, diff = {}'.format(num_parameters, num_state_dict, num_state_dict - num_parameters))
 
             grad = torch.autograd.grad(loss, self.net.state_dict(), allow_unused=True)
             fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, self.net.state_dict())))
