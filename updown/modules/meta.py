@@ -203,7 +203,8 @@ class Meta(nn.Module):
             for _,v in net.state_dict().items():
                 if v.requires_grad:
                     params += [v]
-
+            if params == []:
+                params = net.parameters()
             # 2. compute grad on theta_pi
             grad = torch.autograd.grad(loss, params)
             # 3. theta_pi = theta_pi - train_lr * grad
