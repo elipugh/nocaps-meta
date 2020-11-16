@@ -157,7 +157,7 @@ if __name__ == "__main__":
             losses_all_test = []
             for i in range(100):
                 batches = next(train_dataloader)
-                loss = maml.finetuning(x, y)
+                loss = maml.finetuning(batches)
                 losses_all_test.append(loss)
             losses = np.array(losses_all_test).mean(axis=0).astype(np.float16)
             print("Test acc:", losses)
