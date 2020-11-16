@@ -218,8 +218,6 @@ class Meta(nn.Module):
                 if v.requires_grad:
                     sd2[key] = params[i]
                     i += 1
-            net.load_state_dict(sd2)
-            losses += [net(x_qry, y_qry)["loss"].mean()]
 
 
         del net
