@@ -19,8 +19,10 @@ import h5py
 from nltk.tokenize import word_tokenize
 from tqdm import tqdm
 
+from torch.utils.data import Sampler
 
-class MetaBatchSampler(object):
+
+class MetaBatchSampler(Sampler):
     r'''
     PrototypicalBatchSampler: yield a batch of indexes at each iteration.
     Indexes are calculated by keeping in account 'classes_per_it' and 'num_samples',
@@ -45,7 +47,7 @@ class MetaBatchSampler(object):
         - num_samples: number of samples for each iteration for each class (support + query)
         - iterations: number of iterations (episodes) per epoch
         '''
-        super(MetaBatchSampler, self).__init__()
+        super().__init__()
         self.vocabulary = vocabulary
         self.captions_jsonpath = captions_jsonpath
         self.max_caption_length = max_caption_length
