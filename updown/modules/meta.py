@@ -209,7 +209,7 @@ class Meta(nn.Module):
                 if v.requires_grad:
                     params += [v]
             # 2. compute grad on theta_pi
-            grad = torch.autograd.grad(loss, params)
+            grad = torch.autograd.grad(loss, params, retain_graph=True)
             # 3. theta_pi = theta_pi - train_lr * grad
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
