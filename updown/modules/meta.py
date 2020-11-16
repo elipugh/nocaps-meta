@@ -16,20 +16,20 @@ class Meta(nn.Module):
     """
     Meta Learner
     """
-    def __init__(self, config):
+    def __init__(self, config, vocabulary):
         """
         :param args:
         """
         super(Meta, self).__init__()
 
-        self.update_lr = config.update_lr
-        self.meta_lr = config.meta_lr
-        self.n_way = config.n_way
-        self.k_spt = config.k_spt
-        self.k_qry = config.k_qry
-        self.task_num = config.task_num
-        self.update_step = config.update_step
-        self.update_step_test = config.update_step_test
+        self.update_lr = config.UPDATE_LR
+        self.meta_lr = config.META_LR
+        self.n_way = config.N_WAY
+        self.k_spt = config.K_SPT
+        self.k_qry = config.K_QRY
+        self.task_num = config.TASK_NUM
+        self.update_step = config.UPDATE_STEP
+        self.update_step_test = config.UPDATE_STEP_TEST
         self.vocabulary=vocabulary
 
 
