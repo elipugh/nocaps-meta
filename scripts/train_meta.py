@@ -147,8 +147,10 @@ if __name__ == "__main__":
 
         # keys: {"image_id", "image_features", "caption_tokens"}
         dp = next(train_dataloader)
-        xs = torch.tensor([e["image_id"] for e in dp])
+        xs = torch.tensor([e["image_features"] for e in dp])
         ys = torch.tensor([e["caption_tokens"] for e in dp])
+        print(xs.size())
+        print(ys.size())
         xs, ys = xs.to(device), ys.to(device)
 
         loss = maml(xs,ys)
