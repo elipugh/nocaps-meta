@@ -90,6 +90,10 @@ class Meta(nn.Module):
             loss = output_dict["loss"].mean()
             print(loss)
 
+            num_parameters = sum(p.numel() for p in self.net.parameters())
+            num_state_dict = sum(p.numel() for p in self.net.state_dict.values())
+            print('num parameters = {}, stored in state_dict = {}, diff = {}'.format(num_parameters, num_state_dict, num_state_dict - num_parameters))
+
             print(self.net.state_dict().keys())
 
             grad = torch.autograd.grad(loss, self.net.state_dict(), allow_unused=True)
