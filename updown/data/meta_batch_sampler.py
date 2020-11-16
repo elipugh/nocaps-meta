@@ -53,7 +53,7 @@ class MetaBatchSampler(object):
         self.samples_per_class = num_samples
         self.iterations = iterations
 
-        with open(self._captions_jsonpath) as cap:
+        with open(self.captions_jsonpath) as cap:
             captions_json: Dict[str, Any] = json.load(cap)
 
         PUNCTUATIONS: List[str] = [
