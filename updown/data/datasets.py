@@ -101,8 +101,6 @@ class TrainingDataset(Dataset):
 
     def collate_fn(self, batch_lists: List[TrainingInstance]) -> TrainingBatch:
         batches = []
-        print(batch_lists)
-        print(batch_lists[0])
         for batch_list in batch_lists:
             # Convert lists of ``image_id``s and ``caption_tokens``s as tensors.
             image_id = torch.tensor([instance["image_id"] for instance in batch_list]).long()
@@ -120,7 +118,7 @@ class TrainingDataset(Dataset):
                 "image_features": image_features,
                 "caption_tokens": caption_tokens,
             }
-            batches += batch
+            batches += [batch]
         return batches
 
 
