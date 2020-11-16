@@ -101,13 +101,20 @@ class Meta(nn.Module):
             num_state_dict = sum(p.numel() for p in self.net.state_dict().values())
             print('num parameters = {}, stored in state_dict = {}, diff = {}'.format(num_parameters, num_state_dict, num_state_dict - num_parameters))
 
-            grad = torch.autograd.grad(loss, [v for k,v in self.net.state_dict().items()], allow_unused=True)
-            fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, [v for k,v in self.net.state_dict().items()])))
+            params = [v if not v.requires_grad for k,v in self.net.state_dict().items()]
+            grad = torch.autograd.grad(loss, params, allow_unused=True)
+            fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
+            sd2 = self.net.state_dict()
+            i = 0
+            for k,v in self.net.state_dict().items():
+                if not v.requires_grad:
+                    sd2[k] = fast_weights[i]
+                    i += 1
 
             # this is the loss and accuracy before first update
             with torch.no_grad():
                 # [setsz, nway]
-                output_dict_q = self.net(x_qry, y_qry, self.net.parameters())
+                output_dict_q = self.net(x_qry, y_qry)
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[0] += loss_q
 
@@ -120,14 +127,16 @@ class Meta(nn.Module):
 
             for k in range(1, self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
+                self.net.load_state_dict(sd2)
                 output_dict = self.net(x_spt[i], y_spt[i], fast_weights)
+                self.net.load_state_dict(sd)
                 loss = output_dict["loss"].mean()
                 # 2. compute grad on theta_pi
                 grad = torch.autograd.grad(loss, fast_weights)
                 # 3. theta_pi = theta_pi - train_lr * grad
                 fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, fast_weights)))
 
-                output_dict_q = self.net(x_qry[i], y_qry[i], self.net.parameters())
+                output_dict_q = self.net(x_qry[i], y_qry[i])
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[k + 1] += loss_q
 
