@@ -123,7 +123,7 @@ if __name__ == "__main__":
     train_dataset = TrainingDataset.from_config(_C, vocabulary=vocabulary, in_memory=_A.in_memory)
     train_dataloader = DataLoader(
         train_dataset,
-        batch_size=1,
+        batch_size=10,
         shuffle=True,
         num_workers=_A.cpu_workers,
         collate_fn=train_dataset.collate_fn,

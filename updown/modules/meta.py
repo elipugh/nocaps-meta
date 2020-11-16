@@ -70,8 +70,8 @@ class Meta(nn.Module):
         :param y_qry:   [b, querysz, maxlen, d_emb]
         :return:
         """
-        x_spt, x_qry = x[:self.k_spt] x[self.k_spt:]
-        y_spt, y_qry = y[:self.k_spt] y[self.k_spt:]
+        x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
+        y_spt, y_qry = y[:self.k_spt], y[self.k_spt:]
         task_num, setsz, c_, h, w = x_spt.size()
         querysz = x_qry.size(1)
 
