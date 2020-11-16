@@ -109,7 +109,8 @@ class MetaBatchSampler(Sampler):
                 if len(possible) >= spc:
                     s = slice(i * spc, (i + 1) * spc)
 
-                    sample_idxs = torch.randperm(possible)[:spc]
+                    sample_idxs = torch.randperm(len(possible))[:spc]
+                    sample_idxs = [possible[e] for e in sample_idxs]
                     batch[s] = sample_idxs
                     i+=1
                 if i > cpi:
