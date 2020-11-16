@@ -147,9 +147,6 @@ if __name__ == "__main__":
 
         # keys: {"image_id", "image_features", "caption_tokens"}
         batches = next(train_dataloader)
-        for b in batches:
-            for key in b:
-                b[key] = b[key].to(device)
 
         loss = maml(batches)
 

@@ -80,8 +80,10 @@ class Meta(nn.Module):
             print(y.size())
             x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
             y_spt, y_qry = y[:self.k_spt], y[self.k_spt:]
+            x_spt, x_qry = x_spt.to_device(), x_qry.to_device()
+            y_spt, y_qry = y_spt.to_device(), y_qry.to_device()
             # 1. run the i-th task and compute loss for k=0
-            optimizer.zero_grad()
+            self.meta_optim.zero_grad()
             sd = self.net.state_dict()
             output_dict = self.net(x_spt, y_spt)
             print(sd)
