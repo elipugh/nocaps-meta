@@ -35,6 +35,7 @@ class Meta(nn.Module):
         self.device = torch.device("cuda:0")
         self.net = UpDownCaptioner.from_config(config, vocabulary=vocabulary).to(self.device)
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
+        self.sd = self.net.state_dict()
 
 
 
@@ -74,8 +75,8 @@ class Meta(nn.Module):
 
         losses_q = [0 for _ in range(self.update_step + 1)]
 
-        for i in range(task_num):
-            x,y = batch[i]["image_features"], batch[i]["caption_tokens"]
+        for it in range(task_num):
+            x,y = batch[it]["image_features"], batch[it]["caption_tokens"]
             print(x.size())
             print(y.size())
             x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
@@ -85,38 +86,31 @@ class Meta(nn.Module):
             # 1. run the i-th task and compute loss for k=0
             self.net.train()
             self.meta_optim.zero_grad()
-            sd = self.net.state_dict()
+
             output_dict = self.net(x_spt, y_spt)
 
             loss = output_dict["loss"].mean()
             print(loss)
 
-            print(self.net.state_dict().keys())
-
-            for p in self.parameters():
-                if not p.requires_grad:
-                    print(p)
-
-            num_parameters = sum(p.numel() for p in self.net.parameters())
-            num_state_dict = sum(p.numel() for p in self.net.state_dict().values())
-            print('num parameters = {}, stored in state_dict = {}, diff = {}'.format(num_parameters, num_state_dict, num_state_dict - num_parameters))
-
             params = []
-            for k,v in self.net.state_dict().items():
+            for k,v in self.sd:
                 if v.requires_grad:
                     params += v
+
             grad = torch.autograd.grad(loss, params, allow_unused=True)
-            fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
-            sd2 = self.net.state_dict()
+            params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
+
+            sd2 = deepcopy(self.sd)
             i = 0
             for k,v in self.net.state_dict().items():
                 if v.requires_grad:
-                    sd2[k] = fast_weights[i]
+                    sd2[k] = params[i]
                     i += 1
 
             # this is the loss and accuracy before first update
             with torch.no_grad():
                 # [setsz, nway]
+                self.net.load_state_dict(self.sd)
                 output_dict_q = self.net(x_qry, y_qry)
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[0] += loss_q
@@ -124,21 +118,32 @@ class Meta(nn.Module):
             # this is the loss and accuracy after the first update
             with torch.no_grad():
                 # [setsz, nway]
-                output_dict_q = self.net(x_qry, y_qry, fast_weights)
+                self.net.load_state_dict(sd2)
+                output_dict_q = self.net(x_qry, y_qry)
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[1] += loss_q
 
             for k in range(1, self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
                 self.net.load_state_dict(sd2)
-                output_dict = self.net(x_spt[i], y_spt[i], fast_weights)
-                self.net.load_state_dict(sd)
+                output_dict = self.net(x_spt[i], y_spt[i])
                 loss = output_dict["loss"].mean()
                 # 2. compute grad on theta_pi
-                grad = torch.autograd.grad(loss, fast_weights)
+                params = []
+                for k,v in self.net.state_dict().items():
+                    if v.requires_grad:
+                        params += v
+                grad = torch.autograd.grad(loss, params)
                 # 3. theta_pi = theta_pi - train_lr * grad
-                fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, fast_weights)))
+                params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
+                sd2 = deepcopy(self.net.state_dict())
+                i = 0
+                for k,v in self.net.state_dict().items():
+                    if v.requires_grad:
+                        sd2[k] = params[i]
+                        i += 1
+                self.net.load_state_dict(sd2)
                 output_dict_q = self.net(x_qry[i], y_qry[i])
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[k + 1] += loss_q
