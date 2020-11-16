@@ -87,7 +87,7 @@ class Meta(nn.Module):
             self.meta_optim.zero_grad()
             sd = self.net.state_dict()
             output_dict = self.net(x_spt, y_spt)
-            print(sd)
+
             loss = output_dict["loss"].mean()
             print(loss)
 
@@ -101,8 +101,8 @@ class Meta(nn.Module):
             num_state_dict = sum(p.numel() for p in self.net.state_dict().values())
             print('num parameters = {}, stored in state_dict = {}, diff = {}'.format(num_parameters, num_state_dict, num_state_dict - num_parameters))
 
-            grad = torch.autograd.grad(loss, [v for k,v in self.net.state_dict()], allow_unused=True)
-            fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, [v for k,v in self.net.state_dict()])))
+            grad = torch.autograd.grad(loss, [v for k,v in self.net.state_dict().items()], allow_unused=True)
+            fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, [v for k,v in self.net.state_dict().items()])))
 
             # this is the loss and accuracy before first update
             with torch.no_grad():
