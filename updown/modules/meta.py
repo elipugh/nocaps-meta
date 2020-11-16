@@ -189,7 +189,7 @@ class Meta(nn.Module):
                 params += [v]
 
         print(params)
-        grad = torch.autograd.grad(loss, params)
+        grad = torch.autograd.grad(loss, params, retain_graph=True)
         params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
         sd2 = deepcopy(net.state_dict())
         i = 0
