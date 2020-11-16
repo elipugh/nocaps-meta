@@ -127,7 +127,7 @@ if __name__ == "__main__":
         shuffle=True,
         num_workers=_A.cpu_workers,
         collate_fn=train_dataset.collate_fn,
-        sampler=MetaBatchSampler.from_config(_C,vocabulary=vocabulary)
+        sampler=MetaBatchSampler.from_config(_C,vocabulary=vocabulary, in_memory=False)
     )
     # Make dataloader cyclic for sampling batches perpetually.
     train_dataloader = cycle(train_dataloader, device)
