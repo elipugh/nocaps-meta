@@ -193,7 +193,7 @@ class Meta(nn.Module):
         params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
         sd2 = deepcopy(net.state_dict())
         i = 0
-        for k,v in net.state_dict.items():
+        for k,v in net.state_dict().items():
             if v.requires_grad:
                 sd2[k] = params[i]
                 i += 1
@@ -214,7 +214,7 @@ class Meta(nn.Module):
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
             i = 0
-            for key,v in net.state_dict.items():
+            for key,v in net.state_dict().items():
                 if v.requires_grad:
                     sd2[key] = params[i]
                     i += 1
