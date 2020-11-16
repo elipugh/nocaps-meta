@@ -93,6 +93,8 @@ class Meta(nn.Module):
             num_parameters = sum(p.numel() for p in self.net.parameters())
             num_state_dict = sum(p.numel() for p in self.net.state_dict.values())
             print('num parameters = {}, stored in state_dict = {}, diff = {}'.format(num_parameters, num_state_dict, num_state_dict - num_parameters))
+            for n,p in self.parameters():
+                print(n, p.requires_grad)
 
             print(self.net.state_dict().keys())
 
