@@ -126,7 +126,7 @@ class Meta(nn.Module):
             for k in range(1, self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
                 self.net.load_state_dict(sd2)
-                output_dict = self.net(x_spt[i], y_spt[i])
+                output_dict = self.net(torch.unsqueeze(x_spt[i],0), torch.unsqueeze(y_spt[i],0))
                 loss = output_dict["loss"].mean()
                 # 2. compute grad on theta_pi
                 params = []
