@@ -75,26 +75,29 @@ class TrainingDataset(Dataset):
         # Number of training examples are number of captions, not number of images.
         return len(self._captions_reader)
 
-    def __getitem__(self, index: int) -> TrainingInstance:
-        image_id, caption = self._captions_reader[index]
-        image_features = self._image_features_reader[image_id]
+    def __getitem__(self, indexes: list) -> TrainingInstance:
+        items = []
+        for index in indexes:
+            image_id, caption = self._captions_reader[index]
+            image_features = self._image_features_reader[image_id]
 
-        # Tokenize caption.
-        caption_tokens: List[int] = [self._vocabulary.get_token_index(c) for c in caption]
+            # Tokenize caption.
+            caption_tokens: List[int] = [self._vocabulary.get_token_index(c) for c in caption]
 
-        # Pad upto max_caption_length.
-        caption_tokens = caption_tokens[: self._max_caption_length]
-        caption_tokens.extend(
-            [self._vocabulary.get_token_index("@@UNKNOWN@@")]
-            * (self._max_caption_length - len(caption_tokens))
-        )
+            # Pad upto max_caption_length.
+            caption_tokens = caption_tokens[: self._max_caption_length]
+            caption_tokens.extend(
+                [self._vocabulary.get_token_index("@@UNKNOWN@@")]
+                * (self._max_caption_length - len(caption_tokens))
+            )
 
-        item: TrainingInstance = {
-            "image_id": image_id,
-            "image_features": image_features,
-            "caption_tokens": caption_tokens,
-        }
-        return item
+            item: TrainingInstance = {
+                "image_id": image_id,
+                "image_features": image_features,
+                "caption_tokens": caption_tokens,
+            }
+            items += [item]
+        return items
 
     def collate_fn(self, batch_list: List[TrainingInstance]) -> TrainingBatch:
         # Convert lists of ``image_id``s and ``caption_tokens``s as tensors.

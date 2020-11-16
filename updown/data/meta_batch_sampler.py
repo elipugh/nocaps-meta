@@ -113,7 +113,7 @@ class MetaBatchSampler(Sampler):
                     sample_idxs = [possible[e] for e in sample_idxs]
                     batch[s] = torch.tensor(sample_idxs)
                     i+=1
-                if i > cpi:
+                if i >= cpi:
                     break
 
             batch = batch[torch.randperm(len(batch))]
