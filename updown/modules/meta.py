@@ -94,7 +94,8 @@ class Meta(nn.Module):
             print(self.net.state_dict().keys())
 
             for p in self.parameters():
-                print(p.requires_grad)
+                if not p.requires_grad:
+                    print(p)
 
             num_parameters = sum(p.numel() for p in self.net.parameters())
             num_state_dict = sum(p.numel() for p in self.net.state_dict().values())
