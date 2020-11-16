@@ -149,7 +149,7 @@ if __name__ == "__main__":
         dp = next(train_dataloader)
         xs = torch.tensor([e["image_id"] for e in dp])
         ys = torch.tensor([e["caption_tokens"] for e in dp])
-        xs, yy = xs.to(device), ys.to(device)
+        xs, ys = xs.to(device), ys.to(device)
 
         loss = maml(xs,ys)
         if (iteration%30) == 0:
