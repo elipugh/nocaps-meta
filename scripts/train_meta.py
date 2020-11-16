@@ -147,6 +147,8 @@ if __name__ == "__main__":
 
         # keys: {"image_id", "image_features", "caption_tokens"}
         dp = next(train_dataloader)
+        print(dp)
+        print(dp[0])
         xs = torch.tensor([e["image_features"] for e in dp])
         ys = torch.tensor([e["caption_tokens"] for e in dp])
         print(xs.size())
