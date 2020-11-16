@@ -7,7 +7,7 @@ from    torch.utils.data import TensorDataset, DataLoader
 from    torch import optim
 import  numpy as np
 
-from    models.updwon_captioner import UpDownCaptioner
+from    updown.models.updown_captioner import UpDownCaptioner
 from    copy import deepcopy
 
 
