@@ -32,8 +32,8 @@ class Meta(nn.Module):
         self.update_step_test = config.DATA.UPDATE_STEP_TEST
         self.vocabulary=vocabulary
 
-        device = torch.device("cuda:0")
-        self.net = UpDownCaptioner.from_config(config, vocabulary=vocabulary).to(device)
+        self.device = torch.device("cuda:0")
+        self.net = UpDownCaptioner.from_config(config, vocabulary=vocabulary).to(self.device)
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
 
@@ -80,8 +80,8 @@ class Meta(nn.Module):
             print(y.size())
             x_spt, x_qry = x[:self.k_spt], x[self.k_spt:]
             y_spt, y_qry = y[:self.k_spt], y[self.k_spt:]
-            x_spt, x_qry = x_spt.to_device(), x_qry.to_device()
-            y_spt, y_qry = y_spt.to_device(), y_qry.to_device()
+            x_spt, x_qry = x_spt.to(self.device), x_qry.to(self.device)
+            y_spt, y_qry = y_spt.to(self.device), y_qry.to(self.device)
             # 1. run the i-th task and compute loss for k=0
             self.meta_optim.zero_grad()
             sd = self.net.state_dict()
