@@ -179,6 +179,7 @@ class Meta(nn.Module):
         net = deepcopy(self.net)
 
         # 1. run the i-th task and compute loss for k=0
+        net.load_state_dict(self.sd)
         net.train()
         loss = net(x_spt,y_spt)
         params = []
