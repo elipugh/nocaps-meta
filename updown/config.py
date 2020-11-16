@@ -151,6 +151,14 @@ class Config(object):
         _C.DATA.CLASSES_PER_IT = 32
         _C.DATA.NUM_SAMPLES = 5
         _C.DATA.ITERATIONS = 64
+        _C.DATA.N_WAY = 5
+        _C.DATA.K_SPT = 3
+        _C.DATA.K_QRY = 3
+        _C.DATA.TASK_NUM = 4
+        _C.DATA.META_LR = 0.001
+        _C.DATA.UPDATE_LR = 0.01
+        _C.DATA.UPDATE_STEP = 5
+        _C.DATA.UPDATE_STEP_TEST = 10
 
         _C.DATA.CBS.NMS_THRESHOLD = 0.85
         _C.DATA.CBS.MAX_GIVEN_CONSTRAINTS = 3
