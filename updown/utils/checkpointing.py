@@ -92,8 +92,8 @@ class CheckpointManager(object):
             else:
                 models_state_dict[key] = self._models[key].state_dict()
 
-        if (self._mode == "min" and metric == self._best_metric) or (
-            self._mode == "max" and metric == self._best_metric
+        if (self._mode == "min" and metric < self._best_metric) or (
+            self._mode == "max" and metric > self._best_metric
         ):
             self._best_metric = metric
             self._best_ckpt = copy.copy(models_state_dict)
@@ -110,3 +110,13 @@ class CheckpointManager(object):
             self._best_ckpt,
             os.path.join(self._serialization_dir, f"{self._filename_prefix}_best.pth"),
         )
+
+        if metric == self._best_metric:
+            try:
+                from google.colab import files
+                f=os.path.join(
+                    self._serialization_dir, f"{self._filename_prefix}_{epoch_or_iteration}.pth"
+                )
+                files.download(f)
+            except:
+                pass
