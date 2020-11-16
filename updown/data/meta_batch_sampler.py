@@ -62,7 +62,7 @@ class MetaBatchSampler(object):
         ]
 
         self.n_data = len(captions_json["annotations"])
-        self.words2idxs = defaultdict()
+        self.words2idxs = defaultdict(list)
         print(f"Setting up sampler...")
         i = 0
         for caption_item in tqdm(captions_json["annotations"]):

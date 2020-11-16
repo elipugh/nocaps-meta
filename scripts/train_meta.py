@@ -133,7 +133,7 @@ if __name__ == "__main__":
     train_dataloader = cycle(train_dataloader, device)
 
     # TODO setup args
-    maml = Meta(args, _C).to(device)
+    maml = Meta(_C).to(device)
 
     # --------------------------------------------------------------------------------------------
     #  BEFORE TRAINING STARTS

@@ -16,7 +16,7 @@ class Meta(nn.Module):
     """
     Meta Learner
     """
-    def __init__(self, args, config):
+    def __init__(self, config):
         """
         :param args:
         """
