@@ -62,7 +62,7 @@ class Meta(nn.Module):
         return total_norm/counter
 
 
-    def forward(self, x, y):
+    def forward(self, batch):
         """
         :param x_spt:   [b, setsz, c_, h, w]
         :param y_spt:   [b, setsz, maxlen, d_emb]

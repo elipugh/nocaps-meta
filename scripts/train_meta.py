@@ -146,14 +146,12 @@ if __name__ == "__main__":
     for iteration in tqdm(range(0, _C.OPTIM.NUM_ITERATIONS + 1)):
 
         # keys: {"image_id", "image_features", "caption_tokens"}
-        dp = next(train_dataloader)
-        xs = torch.tensor([e["image_features"] for e in dp])
-        ys = torch.tensor([e["caption_tokens"] for e in dp])
-        print(xs.size())
-        print(ys.size())
-        xs, ys = xs.to(device), ys.to(device)
+        batch = next(train_dataloader)
+        for b in batch:
+            for key in b:
+                b[key] = b[key].to(device)
 
-        loss = maml(xs,ys)
+        loss = maml(batch)
         if (iteration%30) == 0:
             print(loss)
 
