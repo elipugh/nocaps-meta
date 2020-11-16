@@ -105,7 +105,7 @@ if __name__ == "__main__":
     torch.backends.cudnn.deterministic = True
 
     # Set device according to specified GPU ids.
-    device = torch.device(f"cuda:{_A.gpu_ids[0]}" if _A.gpu_ids[0] >= 0 else "cpu")
+    device = torch.device("cuda:0")
 
     # --------------------------------------------------------------------------------------------
     #   INSTANTIATE VOCABULARY, DATALOADER, MODEL, OPTIMIZER
