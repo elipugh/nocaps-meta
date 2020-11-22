@@ -120,7 +120,7 @@ class Meta(nn.Module):
             for k in range(1, self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
                 self.net.load_state_dict(sd2)
-                output_dict = self.net(torch.unsqueeze(x_spt[i],0), torch.unsqueeze(y_spt[i],0))
+                output_dict = self.net(torch.unsqueeze(x_spt[it],0), torch.unsqueeze(y_spt[it],0))
                 loss = output_dict["loss"].mean()
                 # 2. compute grad on theta_pi
                 params = []
@@ -170,17 +170,17 @@ class Meta(nn.Module):
         y_spt, y_qry = y_spt.to(self.device), y_qry.to(self.device)
 
         sd2 = deepcopy(self.sd)
-
-        # 1. run the i-th task and compute loss for k=0
+        losses_q = [0 for _ in range(self.update_step + 1)]
         self.net.load_state_dict(sd2)
         self.net.train()
+
         output_dict = self.net(x_spt,y_spt)
         loss = output_dict["loss"].mean()
+
         params = []
         for k,v in self.sd.items():
             if v.requires_grad:
                 params += [v]
-
         grad = torch.autograd.grad(loss, params, retain_graph=True)
         params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
         i = 0
@@ -189,19 +189,25 @@ class Meta(nn.Module):
                 sd2[k] = params[i]
                 i += 1
 
-        losses = []
+        with torch.no_grad():
+            self.net.load_state_dict(self.sd)
+            loss_q = self.net(x_spt,y_spt)
+            losses_q[0] += loss_q
+
+        with torch.no_grad():
+            self.net.load_state_dict(sd2)
+            loss_q = self.net(x_spt,y_spt)
+            losses_q[1] += loss_q
+
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
-            self.net.load_state_dict(sd2)
             output_dict = self.net(x_spt, y_spt)
             loss = output_dict["loss"].mean()
             params = []
             for _,v in self.sd.items():
                 if v.requires_grad:
                     params += [v]
-            # 2. compute grad on theta_pi
-            grad = torch.autograd.grad(loss, params)
-            # 3. theta_pi = theta_pi - train_lr * grad
+            grad = torch.autograd.grad(loss, params, retain_graph=True)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
             i = 0
             for key,v in self.sd.items():
@@ -209,6 +215,11 @@ class Meta(nn.Module):
                     sd2[key] = params[i]
                     i += 1
 
-        return losses
+            self.net.load_state_dict(sd2)
+            output_dict = self.net(x_spt, y_spt)
+            loss_q = output_dict["loss"].mean()
+            losses_q[k+1] += losses_q
+
+        return losses_q
 
 
