@@ -93,7 +93,7 @@ class Meta(nn.Module):
             grad = torch.autograd.grad(loss, params, allow_unused=True)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
-            sd2 = deepcopy(self.sd)
+            sd2 = deepcopy(self.net.state_dict(keep_vars=True))
             i = 0
             for k,v in self.net.state_dict(keep_vars=True).items():
                 if v.requires_grad:
@@ -172,12 +172,11 @@ class Meta(nn.Module):
         x_spt, x_qry = x_spt.to(self.device), x_qry.to(self.device)
         y_spt, y_qry = y_spt.to(self.device), y_qry.to(self.device)
 
-        sd2 = deepcopy(self.sd)
-        losses_q = [0 for _ in range(self.update_step + 1)]
-        self.net.load_state_dict(sd2)
         self.net.train()
         self.meta_optim.zero_grad()
 
+        sd2 = deepcopy(self.net.state_dict(keep_vars=True))
+        losses_q = [0 for _ in range(self.update_step + 1)]
 
         output_dict = self.net(x_spt,y_spt)
         loss = output_dict["loss"].mean()
@@ -195,7 +194,6 @@ class Meta(nn.Module):
                 i += 1
 
         with torch.no_grad():
-            self.net.load_state_dict(self.sd)
             output_dict_q = self.net(x_spt,y_spt)
             loss_q = output_dict_q["loss"].mean()
             losses_q[0] += loss_q
@@ -207,14 +205,15 @@ class Meta(nn.Module):
             losses_q[1] += loss_q
 
         for k in range(1, self.update_step_test):
+            self.net.load_state_dict(sd2)
+            self.net.train()
             # 1. run the i-th task and compute loss for k=1~K-1
-            output_dict = self.net(x_spt, y_spt)
+            output_dict = self.net(torch.unsqueeze(x_spt[0],0), torch.unsqueeze(y_spt[0],0))
             loss = output_dict["loss"].mean()
             params = []
             for _,v in self.net.state_dict(keep_vars=True).items():
                 if v.requires_grad:
                     params += [v]
-
             grad = torch.autograd.grad(loss, params)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
             i = 0
@@ -224,7 +223,7 @@ class Meta(nn.Module):
                     i += 1
 
             self.net.load_state_dict(sd2)
-            output_dict = self.net(x_spt, y_spt)
+            output_dict = self.net(torch.unsqueeze(x_spt[0],0), torch.unsqueeze(y_spt[0],0))
             loss_q = output_dict["loss"].mean()
             losses_q[k+1] += loss_q
 
