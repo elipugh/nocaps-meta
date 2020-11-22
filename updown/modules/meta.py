@@ -181,7 +181,7 @@ class Meta(nn.Module):
         for k,v in self.sd.items():
             if v.requires_grad:
                 params += [v]
-        grad = torch.autograd.grad(loss, params, retain_graph=True)
+        grad = torch.autograd.grad(loss, params)
         params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
         i = 0
         for k,v in self.sd.items():
@@ -209,7 +209,7 @@ class Meta(nn.Module):
             for _,v in self.sd.items():
                 if v.requires_grad:
                     params += [v]
-            grad = torch.autograd.grad(loss, params, retain_graph=True)
+            grad = torch.autograd.grad(loss, params)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
             i = 0
             for key,v in self.sd.items():
