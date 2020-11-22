@@ -191,12 +191,14 @@ class Meta(nn.Module):
 
         with torch.no_grad():
             self.net.load_state_dict(self.sd)
-            loss_q = self.net(x_spt,y_spt)
+            output_dict_q = self.net(x_spt,y_spt)
+            loss_q = output_dict_q["loss"].mean()
             losses_q[0] += loss_q
 
         with torch.no_grad():
             self.net.load_state_dict(sd2)
-            loss_q = self.net(x_spt,y_spt)
+            output_dict_q = self.net(x_spt,y_spt)
+            loss_q = output_dict_q["loss"].mean()
             losses_q[1] += loss_q
 
         for k in range(1, self.update_step_test):
