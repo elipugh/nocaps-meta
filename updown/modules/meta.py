@@ -96,6 +96,7 @@ class Meta(nn.Module):
                     params[-1].requires_grad = True
 
             grad = torch.autograd.grad(loss, params, allow_unused=True)
+            print(grad)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
             sd2 = deepcopy(self.sd)
