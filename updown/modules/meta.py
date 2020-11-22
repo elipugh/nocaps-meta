@@ -127,6 +127,7 @@ class Meta(nn.Module):
                 for _,v in self.sd.items():
                     if v.requires_grad:
                         params += [v]
+                print(len(params))
                 grad = torch.autograd.grad(loss, params)
                 # 3. theta_pi = theta_pi - train_lr * grad
                 params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
@@ -210,7 +211,7 @@ class Meta(nn.Module):
             for _,v in self.sd.items():
                 if v.requires_grad:
                     params += [v]
-            print(len(params))
+
             grad = torch.autograd.grad(loss, params, retain_graph=True)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
             i = 0
@@ -224,9 +225,9 @@ class Meta(nn.Module):
             loss_q = output_dict["loss"].mean()
             losses_q[k+1] += loss_q
 
-            for key,v in sd3.items():
-                print((v-sd2[key]).mean(), end="\r")
-            print()
+            # for key,v in sd3.items():
+            #     print((v-sd2[key]).mean(), end="\r")
+            # print()
 
         return losses_q
 
