@@ -91,7 +91,7 @@ class Meta(nn.Module):
 
             params = []
             for k,v in self.net.state_dict().items():
-                if v.requires_grad:
+                if v.requires_grad or True:
                     params += [v]
 
             grad = torch.autograd.grad(loss, params, allow_unused=True)
