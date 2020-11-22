@@ -150,7 +150,7 @@ if __name__ == "__main__":
 
         loss = maml(batches)
 
-        if (iteration%30) == 0:
+        if ((iteration+0)%25) == 0:
             print(loss)
 
         if (iteration%500) == 0:
@@ -160,7 +160,7 @@ if __name__ == "__main__":
                 loss = maml.finetuning(batches)
                 losses_all_test.append(loss)
             losses = np.array(losses_all_test).mean(axis=0).astype(np.float16)
-            print("Test acc:", losses)
+            print("Test losses:", losses)
             # Log loss and learning rate to tensorboard.
             #tensorboard_writer.add_scalar("loss", batch_loss, iteration)
 
