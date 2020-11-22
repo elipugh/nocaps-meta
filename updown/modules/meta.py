@@ -220,7 +220,7 @@ class Meta(nn.Module):
             self.net.load_state_dict(sd2)
             output_dict = self.net(x_spt, y_spt)
             loss_q = output_dict["loss"].mean()
-            losses_q[k+1] += losses_q
+            losses_q[k+1] += loss_q
 
         return losses_q
 
