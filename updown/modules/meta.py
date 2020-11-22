@@ -86,8 +86,11 @@ class Meta(nn.Module):
 
             loss = output_dict["loss"].mean()
 
+            for param in self.net.parameters():
+                param.requires_grad = True
+
             params = []
-            for k,v in self.sd.items():
+            for k,v in self.net.state_dict.items():
                 if v.requires_grad:
                     params += [v]
 
@@ -96,10 +99,9 @@ class Meta(nn.Module):
 
             sd2 = deepcopy(self.sd)
             i = 0
-            for k,v in self.sd.items():
+            for k,v in self.net.state_dict.items():
                 if v.requires_grad:
                     sd2[k] = params[i]
-                    sd2[k].requires_grad = True
                     i += 1
 
             # this is the loss and accuracy before first update
@@ -118,14 +120,19 @@ class Meta(nn.Module):
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[1] += loss_q
 
+            self.net.train()
+
             for k in range(1, self.update_step):
+                for param in self.net.parameters():
+                    param.requires_grad = True
                 # 1. run the i-th task and compute loss for k=1~K-1
                 self.net.load_state_dict(sd2)
+                self.net.train()
                 output_dict = self.net(torch.unsqueeze(x_spt[it],0), torch.unsqueeze(y_spt[it],0))
                 loss = output_dict["loss"].mean()
                 # 2. compute grad on theta_pi
                 params = []
-                for _,v in self.sd.items():
+                for _,v in self.net.state_dict.items():
                     if v.requires_grad:
                         params += [v]
                 print(len(params))
@@ -134,10 +141,9 @@ class Meta(nn.Module):
                 params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
                 i = 0
-                for key,v in self.sd.items():
+                for key,v in self.net.state_dict.items():
                     if v.requires_grad:
                         sd2[key] = params[i]
-                        sd2[k].requires_grad = True
                         i += 1
                 self.net.load_state_dict(sd2)
                 output_dict_q = self.net(torch.unsqueeze(x_qry[it],0), torch.unsqueeze(y_qry[it],0))
