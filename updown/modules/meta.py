@@ -99,6 +99,7 @@ class Meta(nn.Module):
             for k,v in self.sd.items():
                 if v.requires_grad:
                     sd2[k] = params[i]
+                    sd2[k].requires_grad = True
                     i += 1
 
             # this is the loss and accuracy before first update
@@ -136,6 +137,7 @@ class Meta(nn.Module):
                 for key,v in self.sd.items():
                     if v.requires_grad:
                         sd2[key] = params[i]
+                        sd2[k].requires_grad = True
                         i += 1
                 self.net.load_state_dict(sd2)
                 output_dict_q = self.net(torch.unsqueeze(x_qry[it],0), torch.unsqueeze(y_qry[it],0))
@@ -174,6 +176,8 @@ class Meta(nn.Module):
         losses_q = [0 for _ in range(self.update_step + 1)]
         self.net.load_state_dict(sd2)
         self.net.train()
+        self.meta_optim.zero_grad()
+
 
         output_dict = self.net(x_spt,y_spt)
         loss = output_dict["loss"].mean()
