@@ -83,19 +83,14 @@ class Meta(nn.Module):
             self.meta_optim.zero_grad()
 
             output_dict = self.net(x_spt, y_spt)
-
             loss = output_dict["loss"].mean()
-            loss.backward(retain_graph=True)
-
-            for param in self.net.parameters():
-                param.requires_grad = True
 
             params = []
-            for k,v in self.net.state_dict().items():
-                if v.requires_grad or True:
+            for k,v in self.net.state_dict(keep_vars=True).items():
+                if v.requires_grad:
                     params += [v]
-                    params[-1].requires_grad = True
 
+            print(len(params))
             grad = torch.autograd.grad(loss, params, allow_unused=True)
             print(grad)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
