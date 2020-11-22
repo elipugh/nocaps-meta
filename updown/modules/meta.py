@@ -32,7 +32,7 @@ class Meta(nn.Module):
         self.device = torch.device("cuda:0")
         self.net = UpDownCaptioner.from_config(config, vocabulary=vocabulary).to(self.device)
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
-        self.sd = self.net.state_dict()
+        self.sd = self.net.state_dict(keep_vars=True)
 
 
 
@@ -90,9 +90,7 @@ class Meta(nn.Module):
                 if v.requires_grad:
                     params += [v]
 
-            print(len(params))
             grad = torch.autograd.grad(loss, params, allow_unused=True)
-            print(grad)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
             sd2 = deepcopy(self.sd)
@@ -131,7 +129,7 @@ class Meta(nn.Module):
                 for _,v in self.net.state_dict(keep_vars=True).items():
                     if v.requires_grad:
                         params += [v]
-                print(len(params))
+
                 grad = torch.autograd.grad(loss, params)
                 # 3. theta_pi = theta_pi - train_lr * grad
                 params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
