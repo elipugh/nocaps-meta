@@ -90,7 +90,7 @@ class Meta(nn.Module):
                 param.requires_grad = True
 
             params = []
-            for k,v in self.net.state_dict.items():
+            for k,v in self.net.state_dict().items():
                 if v.requires_grad:
                     params += [v]
 
@@ -99,7 +99,7 @@ class Meta(nn.Module):
 
             sd2 = deepcopy(self.sd)
             i = 0
-            for k,v in self.net.state_dict.items():
+            for k,v in self.net.state_dict().items():
                 if v.requires_grad:
                     sd2[k] = params[i]
                     i += 1
@@ -132,7 +132,7 @@ class Meta(nn.Module):
                 loss = output_dict["loss"].mean()
                 # 2. compute grad on theta_pi
                 params = []
-                for _,v in self.net.state_dict.items():
+                for _,v in self.net.state_dict().items():
                     if v.requires_grad:
                         params += [v]
                 print(len(params))
@@ -141,7 +141,7 @@ class Meta(nn.Module):
                 params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
                 i = 0
-                for key,v in self.net.state_dict.items():
+                for key,v in self.net.state_dict().items():
                     if v.requires_grad:
                         sd2[key] = params[i]
                         i += 1
