@@ -183,13 +183,13 @@ class Meta(nn.Module):
         loss = output_dict["loss"].mean()
 
         params = []
-        for k,v in self.sd.items():
+        for k,v in self.net.state_dict(keep_vars=True).items():
             if v.requires_grad:
                 params += [v]
         grad = torch.autograd.grad(loss, params, retain_graph=True)
         params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
         i = 0
-        for k,v in self.sd.items():
+        for k,v in self.net.state_dict(keep_vars=True).items():
             if v.requires_grad:
                 sd2[k] = params[i]
                 i += 1
@@ -206,20 +206,19 @@ class Meta(nn.Module):
             loss_q = output_dict_q["loss"].mean()
             losses_q[1] += loss_q
 
-        sd3 = deepcopy(sd2)
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
             output_dict = self.net(x_spt, y_spt)
             loss = output_dict["loss"].mean()
             params = []
-            for _,v in self.sd.items():
+            for _,v in self.net.state_dict(keep_vars=True).items():
                 if v.requires_grad:
                     params += [v]
 
             grad = torch.autograd.grad(loss, params, retain_graph=True)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
             i = 0
-            for key,v in self.sd.items():
+            for key,v in self.net.state_dict(keep_vars=True).items():
                 if v.requires_grad:
                     sd2[key] = params[i]
                     i += 1
@@ -228,10 +227,6 @@ class Meta(nn.Module):
             output_dict = self.net(x_spt, y_spt)
             loss_q = output_dict["loss"].mean()
             losses_q[k+1] += loss_q
-
-            # for key,v in sd3.items():
-            #     print((v-sd2[key]).mean(), end="\r")
-            # print()
 
         return losses_q
 
