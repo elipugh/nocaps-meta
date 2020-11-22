@@ -93,6 +93,7 @@ class Meta(nn.Module):
             for k,v in self.net.state_dict().items():
                 if v.requires_grad or True:
                     params += [v]
+                    params[-1].requires_grad = True
 
             grad = torch.autograd.grad(loss, params, allow_unused=True)
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
@@ -135,6 +136,7 @@ class Meta(nn.Module):
                 for _,v in self.net.state_dict().items():
                     if v.requires_grad or True:
                         params += [v]
+                        params[-1].requires_grad = True
                 print(len(params))
                 grad = torch.autograd.grad(loss, params)
                 # 3. theta_pi = theta_pi - train_lr * grad
