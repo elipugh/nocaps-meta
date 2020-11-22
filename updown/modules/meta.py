@@ -85,7 +85,7 @@ class Meta(nn.Module):
             output_dict = self.net(x_spt, y_spt)
 
             loss = output_dict["loss"].mean()
-            loss.backward()
+            loss.backward(retain_graph=True)
 
             for param in self.net.parameters():
                 param.requires_grad = True
