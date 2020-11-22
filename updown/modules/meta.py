@@ -24,14 +24,11 @@ class Meta(nn.Module):
 
         self.update_lr = config.DATA.UPDATE_LR
         self.meta_lr = config.DATA.META_LR
-        self.n_way = config.DATA.N_WAY
         self.k_spt = config.DATA.K_SPT
         self.k_qry = config.DATA.K_QRY
-        self.task_num = config.DATA.TASK_NUM
         self.update_step = config.DATA.UPDATE_STEP
         self.update_step_test = config.DATA.UPDATE_STEP_TEST
         self.vocabulary=vocabulary
-
         self.device = torch.device("cuda:0")
         self.net = UpDownCaptioner.from_config(config, vocabulary=vocabulary).to(self.device)
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
@@ -134,14 +131,13 @@ class Meta(nn.Module):
                 # 3. theta_pi = theta_pi - train_lr * grad
                 params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
 
-                sd2 = deepcopy(self.net.state_dict())
                 i = 0
                 for key,v in self.sd.items():
                     if v.requires_grad:
                         sd2[key] = params[i]
                         i += 1
                 self.net.load_state_dict(sd2)
-                output_dict_q = self.net(torch.unsqueeze(x_qry[i],0), torch.unsqueeze(y_qry[i],0))
+                output_dict_q = self.net(torch.unsqueeze(x_qry[it],0), torch.unsqueeze(y_qry[it],0))
                 loss_q = output_dict_q["loss"].mean()
                 losses_q[k + 1] += loss_q
 
@@ -157,7 +153,7 @@ class Meta(nn.Module):
         #   print(torch.norm(p).item())
         self.meta_optim.step()
 
-        return loss
+        return loss_q
 
     def finetuning(self, batch):
         """
@@ -173,27 +169,22 @@ class Meta(nn.Module):
         x_spt, x_qry = x_spt.to(self.device), x_qry.to(self.device)
         y_spt, y_qry = y_spt.to(self.device), y_qry.to(self.device)
 
-
-        # in order to not ruin the state of running_mean/variance and bn_weight/bias
-        # we finetunning on the copied model instead of self.net
-        net = deepcopy(self.net)
+        sd2 = deepcopy(self.sd)
 
         # 1. run the i-th task and compute loss for k=0
-        net.load_state_dict(self.sd)
-        net.train()
-        output_dict = net(x_spt,y_spt)
+        self.net.load_state_dict(sd2)
+        self.net.train()
+        output_dict = self.net(x_spt,y_spt)
         loss = output_dict["loss"].mean()
         params = []
         for k,v in self.sd.items():
             if v.requires_grad:
                 params += [v]
 
-        print(params)
         grad = torch.autograd.grad(loss, params, retain_graph=True)
         params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
-        sd2 = deepcopy(net.state_dict())
         i = 0
-        for k,v in net.state_dict().items():
+        for k,v in self.sd.items():
             if v.requires_grad:
                 sd2[k] = params[i]
                 i += 1
@@ -201,25 +192,23 @@ class Meta(nn.Module):
         losses = []
         for k in range(1, self.update_step_test):
             # 1. run the i-th task and compute loss for k=1~K-1
-            net.load_state_dict(sd2)
-            output_dict = net(x_spt, y_spt)
+            self.net.load_state_dict(sd2)
+            output_dict = self.net(x_spt, y_spt)
             loss = output_dict["loss"].mean()
             params = []
-            for _,v in net.state_dict().items():
+            for _,v in self.sd.items():
                 if v.requires_grad:
                     params += [v]
             # 2. compute grad on theta_pi
             grad = torch.autograd.grad(loss, params)
             # 3. theta_pi = theta_pi - train_lr * grad
             params = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, params)))
-
             i = 0
             for key,v in net.state_dict().items():
                 if v.requires_grad:
                     sd2[key] = params[i]
                     i += 1
 
-
-        del net
-
         return losses
+
+

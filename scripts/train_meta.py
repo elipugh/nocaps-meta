@@ -154,7 +154,6 @@ if __name__ == "__main__":
             print(loss)
 
         if (iteration%500) == 0:
-            continue
             losses_all_test = []
             for i in range(100):
                 batches = next(train_dataloader)
