@@ -176,7 +176,7 @@ class Meta(nn.Module):
         self.meta_optim.zero_grad()
 
         sd2 = deepcopy(self.net.state_dict(keep_vars=True))
-        losses_q = [0 for _ in range(self.update_step + 1)]
+        losses_q = [0 for _ in range(self.update_step_test + 1)]
 
         output_dict = self.net(x_spt,y_spt)
         loss = output_dict["loss"].mean()
