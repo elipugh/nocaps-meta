@@ -78,6 +78,9 @@ parser.add_argument(
 
 
 if __name__ == "__main__":
+
+    checkpoint = "checkpoint_best.pt"
+
     # --------------------------------------------------------------------------------------------
     #   INPUT ARGUMENTS AND CONFIG
     # --------------------------------------------------------------------------------------------
@@ -131,7 +134,7 @@ if __name__ == "__main__":
     train_dataloader = cycle(train_dataloader, device)
 
     # TODO setup args
-    maml = Meta(_C, vocabulary).to(device)
+    maml = Meta(_C, vocabulary, checkpoint=checkpoint).to(device)
 
     # --------------------------------------------------------------------------------------------
     #  BEFORE TRAINING STARTS

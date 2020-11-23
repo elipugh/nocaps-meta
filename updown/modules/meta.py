@@ -16,7 +16,7 @@ class Meta(nn.Module):
     """
     Meta Learner
     """
-    def __init__(self, config, vocabulary):
+    def __init__(self, config, vocabulary, checkpoint=None):
         """
         :param args:
         """
@@ -30,7 +30,17 @@ class Meta(nn.Module):
         self.update_step_test = config.DATA.UPDATE_STEP_TEST
         self.vocabulary=vocabulary
         self.device = torch.device("cuda:0")
+
         self.net = UpDownCaptioner.from_config(config, vocabulary=vocabulary).to(self.device)
+        if checkpoint is not None:
+            training_checkpoint = torch.load(checkpoint)
+            for key in training_checkpoint:
+                if key == "optimizer":
+                    pass
+                else:
+                    # Don't complain about missing embeddings, they might be absent if frozen.
+                    self.net.load_state_dict(training_checkpoint[key])
+
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
         self.sd = self.net.state_dict(keep_vars=True)
 

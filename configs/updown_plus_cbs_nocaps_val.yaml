@@ -9,17 +9,16 @@ DATA:
   INFER_CAPTIONS: data/nocaps/nocaps_val_image_info.json
 
   MAX_CAPTION_LENGTH: 20
-  CLASSES_PER_IT : 8
+  CLASSES_PER_IT : 10
   NUM_SAMPLES : 5
   ITERATIONS : 64
-  N_WAY : 8
-  K_SPT : 20
-  K_QRY : 20
-  TASK_NUM : 4
+  N_WAY : 10
+  K_SPT : 25
+  K_QRY : 25
   META_LR : 0.001
-  UPDATE_LR : .05
-  UPDATE_STEP : 5
-  UPDATE_STEP_TEST : 10
+  UPDATE_LR : .02
+  UPDATE_STEP : 3
+  UPDATE_STEP_TEST : 5
 
 
 
