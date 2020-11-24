@@ -135,6 +135,7 @@ if __name__ == "__main__":
 
     # TODO setup args
     maml = Meta(_C, vocabulary, checkpoint=checkpoint).to(device)
+    maml = Meta(_C, vocabulary).to(device)
 
     # --------------------------------------------------------------------------------------------
     #  BEFORE TRAINING STARTS
@@ -151,19 +152,27 @@ if __name__ == "__main__":
         # keys: {"image_id", "image_features", "caption_tokens"}
         batches = next(train_dataloader)
 
-        loss = maml(batches)
+        loss1 = maml(batches)
+        loss2 = maml_og(batches)
 
         if ((iteration+0)%25) == 0:
-            print(loss)
+            print("\nWarm:", loss1.numpy())
+            print("\nCold:", loss2.numpy())
+
 
         if (iteration%500) == 0:
-            losses_all_test = []
+            losses_all_test1 = []
+            losses_all_test2 = []
             for i in range(100):
                 batches = next(train_dataloader)
-                loss = maml.finetuning(batches)
-                losses_all_test.append(loss)
-            losses = np.array(losses_all_test).mean(axis=0).astype(np.float16)
-            print("Test losses:", losses)
+                loss1 = maml.finetuning(batches)
+                losses_all_test1.append(loss1)
+                loss2 = maml.finetuning(batches)
+                losses_all_test2.append(loss2)
+            losses1 = np.array(losses_all_test1).mean(axis=0).astype(np.float16)
+            losses2 = np.array(losses_all_test2).mean(axis=0).astype(np.float16)
+            print("Test losses warm:", losses1)
+            print("Test losses cold:", losses2)
             # Log loss and learning rate to tensorboard.
             #tensorboard_writer.add_scalar("loss", batch_loss, iteration)
 
