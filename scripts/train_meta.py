@@ -156,8 +156,8 @@ if __name__ == "__main__":
         loss2 = maml_og(batches)
 
         if ((iteration+0)%25) == 0:
-            print("\nWarm:", loss1.numpy())
-            print("\nCold:", loss2.numpy())
+            print("\nWarm:", loss1)
+            print("\nCold:", loss2)
 
 
         if (iteration%500) == 0:
