@@ -135,7 +135,7 @@ if __name__ == "__main__":
 
     # TODO setup args
     maml = Meta(_C, vocabulary, checkpoint=checkpoint).to(device)
-    maml = Meta(_C, vocabulary).to(device)
+    maml_og = Meta(_C, vocabulary).to(device)
 
     # --------------------------------------------------------------------------------------------
     #  BEFORE TRAINING STARTS
